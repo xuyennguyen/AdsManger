@@ -3,7 +3,8 @@ using System.Collections;
 using Prime31;
 using GoogleMobileAds.Api;
 using UnityEngine.Advertisements;
-
+using System.Collections.Generic;
+using InMobiMiniJSON;
 public class AdsManager : MonoBehaviour {
 
 	private static AdsManager _instance;
@@ -66,6 +67,27 @@ public class AdsManager : MonoBehaviour {
 		SupersonicEvents.onVideoEndEvent += SupersonicEvents_onVideoEndEvent;
 		SupersonicEvents.onVideoStartEvent += SupersonicEvents_onVideoStartEvent;
 
+		// InMobiEvent
+		InMobiAndroidManager.onBannerRequestSucceededEvent += InMobiAndroidManager_onBannerRequestSucceededEvent;
+		InMobiAndroidManager.onBannerRequestFailedEvent += InMobiAndroidManager_onBannerRequestFailedEvent;
+		InMobiAndroidManager.onShowBannerScreenEvent += InMobiAndroidManager_onShowBannerScreenEvent;
+		InMobiAndroidManager.onDismissBannerScreenEvent += InMobiAndroidManager_onDismissBannerScreenEvent;
+		InMobiAndroidManager.onBannerInteractionEvent += InMobiAndroidManager_onBannerInteractionEvent;
+		InMobiAndroidManager.onBannerLeaveApplicationEvent += InMobiAndroidManager_onBannerLeaveApplicationEvent;
+		InMobiAndroidManager.onBannerAdRewardActionCompletedEvent += InMobiAndroidManager_onBannerAdRewardActionCompletedEvent;
+		InMobiAndroidManager.onInterstitialLoadedEvent += InMobiAndroidManager_onInterstitialLoadedEvent;
+		InMobiAndroidManager.onInterstitialFailedEvent += InMobiAndroidManager_onInterstitialFailedEvent;
+		InMobiAndroidManager.onInterstitialInteractionEvent += InMobiAndroidManager_onInterstitialInteractionEvent;
+		InMobiAndroidManager.onShowInterstitialScreenEvent += InMobiAndroidManager_onShowInterstitialScreenEvent;
+		InMobiAndroidManager.onDismissInterstitialScreenEvent += InMobiAndroidManager_onDismissInterstitialScreenEvent;
+		InMobiAndroidManager.onInterstitialInteractionEvent += InMobiAndroidManager_onInterstitialInteractionEvent;
+		InMobiAndroidManager.onInterstitialLeaveApplicationEvent += InMobiAndroidManager_onInterstitialLeaveApplicationEvent;
+		InMobiAndroidManager.onInterstitialAdRewardActionCompletedEvent += InMobiAndroidManager_onInterstitialAdRewardActionCompletedEvent;
+		InMobiAndroidManager.onNativeLoadedEvent += InMobiAndroidManager_onNativeLoadedEvent;
+		InMobiAndroidManager.onNativeFailedEvent += InMobiAndroidManager_onNativeFailedEvent;
+		InMobiAndroidManager.onDismissNativeScreenEvent += InMobiAndroidManager_onDismissNativeScreenEvent;
+		InMobiAndroidManager.onShowNativeScreenEvent += InMobiAndroidManager_onShowNativeScreenEvent;
+		InMobiAndroidManager.onNativeLeaveApplicationEvent += InMobiAndroidManager_onNativeLeaveApplicationEvent;
 	}
 
 	void OnDisable(){
@@ -82,6 +104,29 @@ public class AdsManager : MonoBehaviour {
 		SupersonicEvents.onVideoEndEvent -= SupersonicEvents_onVideoEndEvent;
 		SupersonicEvents.onVideoStartEvent -= SupersonicEvents_onVideoStartEvent;
 
+		// Inmobi event
+
+		InMobiAndroidManager.onBannerRequestSucceededEvent -= InMobiAndroidManager_onBannerRequestSucceededEvent;
+		InMobiAndroidManager.onBannerRequestFailedEvent -= InMobiAndroidManager_onBannerRequestFailedEvent;
+		InMobiAndroidManager.onShowBannerScreenEvent -= InMobiAndroidManager_onShowBannerScreenEvent;
+		InMobiAndroidManager.onDismissBannerScreenEvent -= InMobiAndroidManager_onDismissBannerScreenEvent;
+		InMobiAndroidManager.onBannerInteractionEvent -= InMobiAndroidManager_onBannerInteractionEvent;
+		InMobiAndroidManager.onBannerLeaveApplicationEvent -= InMobiAndroidManager_onBannerLeaveApplicationEvent;
+		InMobiAndroidManager.onBannerAdRewardActionCompletedEvent -= InMobiAndroidManager_onBannerAdRewardActionCompletedEvent;
+		InMobiAndroidManager.onInterstitialLoadedEvent -= InMobiAndroidManager_onInterstitialLoadedEvent;
+		InMobiAndroidManager.onInterstitialFailedEvent -= InMobiAndroidManager_onInterstitialFailedEvent;
+		InMobiAndroidManager.onInterstitialInteractionEvent -= InMobiAndroidManager_onInterstitialInteractionEvent;
+		InMobiAndroidManager.onShowInterstitialScreenEvent -= InMobiAndroidManager_onShowInterstitialScreenEvent;
+		InMobiAndroidManager.onDismissInterstitialScreenEvent -= InMobiAndroidManager_onDismissInterstitialScreenEvent;
+		InMobiAndroidManager.onInterstitialInteractionEvent -= InMobiAndroidManager_onInterstitialInteractionEvent;
+		InMobiAndroidManager.onInterstitialLeaveApplicationEvent -= InMobiAndroidManager_onInterstitialLeaveApplicationEvent;
+		InMobiAndroidManager.onInterstitialAdRewardActionCompletedEvent -= InMobiAndroidManager_onInterstitialAdRewardActionCompletedEvent;
+		InMobiAndroidManager.onNativeLoadedEvent -= InMobiAndroidManager_onNativeLoadedEvent;
+		InMobiAndroidManager.onNativeFailedEvent -= InMobiAndroidManager_onNativeFailedEvent;
+		InMobiAndroidManager.onDismissNativeScreenEvent -= InMobiAndroidManager_onDismissNativeScreenEvent;
+		InMobiAndroidManager.onShowNativeScreenEvent -= InMobiAndroidManager_onShowNativeScreenEvent;
+		InMobiAndroidManager.onNativeLeaveApplicationEvent -= InMobiAndroidManager_onNativeLeaveApplicationEvent;
+
 	}
 
 
@@ -94,6 +139,9 @@ public class AdsManager : MonoBehaviour {
 
 		InitAdColony ();
 		InitAdSupersonic ();
+		InitInmobiAds ();
+		FetechInMobiIntertitial ();
+
 		//InitUnityAds ();
 		_instance = this;
 	}
@@ -198,6 +246,7 @@ public class AdsManager : MonoBehaviour {
 	}
 
 
+
 	void InterstitialAds_AdLeftApplication (object sender, System.EventArgs e)
 	{
 		
@@ -231,20 +280,28 @@ public class AdsManager : MonoBehaviour {
 	}
 
 	public void ShowInterstitial(){
-		
 
-		if (interstitialAds.IsLoaded () == false) {
-		
-			FetechFullscreenAds ();
-		}
 
-		Debug.Log ("AdsManager: interstitialAds.IsLoaded:" + interstitialAds.IsLoaded ());
 
-		if( interstitialAds != null && interstitialAds.IsLoaded()){
+		if (InMobiAndroid.getInterstitialState ("NativeInterstitial") == true) {
+			Debug.Log ("AdsManger NativeInterstitial is ready");
 
-			Debug.Log ("AdsManger ShowInterstitial");
-			interstitialAds.Show();
+			InMobiAndroid.showInterstitial ("NativeInterstitial");
+		} 
+		else {
+			if (interstitialAds.IsLoaded () == false) {
+			
+				FetechFullscreenAds ();
+			}
 
+			Debug.Log ("AdsManager: interstitialAds.IsLoaded:" + interstitialAds.IsLoaded ());
+
+			if (interstitialAds != null && interstitialAds.IsLoaded ()) {
+
+				Debug.Log ("AdsManger ShowInterstitial");
+				interstitialAds.Show ();
+
+			}
 		}
 	}
 
@@ -272,10 +329,23 @@ public class AdsManager : MonoBehaviour {
 
 	public void InitUnityAds(){
 		
-		//Advertisement.Initialize (AdsConfig.AdsUnityAdsAppId, true);
+		Advertisement.Initialize (AdsConfig.AdsUnityAdsAppId, true);
 		
 	}
 
+
+	public void InitInmobiAds(){
+
+		var dict = new Dictionary<string, string> ();
+		InMobiAndroid.init (AdsConfig.AdsInmobAppId, dict);
+	}
+
+	public void FetechInMobiIntertitial(){
+
+		var dict = new Dictionary<string, string> ();
+		dict.Add ("Hi", "Hello");
+		InMobiAndroid.loadInterstitial (AdsConfig.AdsInmobiAdsFullscreenPlacement, "NativeInterstitial", "InMobiInterstitial", dict);
+	}
 	public void PlayAVideo(string adPlacement){
 
 		if (OnVideoStarted != null) {
@@ -389,6 +459,116 @@ public class AdsManager : MonoBehaviour {
 	{
 
 	}
+
+	void InMobiAndroidManager_onDismissBannerScreenEvent()
+	{
+		Debug.Log( "onDismissBannerScreenEvent" );
+	}
+
+
+	void InMobiAndroidManager_onBannerRequestFailedEvent( string error )
+	{
+		Debug.Log( "onBannerRequestFailedEvent: " + error );
+	}
+
+
+	void InMobiAndroidManager_onBannerInteractionEvent( Dictionary<string,object> data )
+	{
+		Debug.Log( "onBannerInteractionEvent" + data );
+	}
+
+
+	void InMobiAndroidManager_onBannerRequestSucceededEvent()
+	{
+		Debug.Log( "onBannerRequestSucceededEvent" );
+	}
+
+
+	void InMobiAndroidManager_onBannerLeaveApplicationEvent()
+	{
+		Debug.Log( "onBannerLeaveApplicationEvent" );
+	}
+
+
+	void InMobiAndroidManager_onShowBannerScreenEvent()
+	{
+		Debug.Log( "onShowBannerScreenEvent" );
+	}
+
+	void  InMobiAndroidManager_onBannerAdRewardActionCompletedEvent( Dictionary<string,object> data)
+	{
+		Debug.Log( "onBannerAdRewardActionCompletedEvent" );
+
+	}
+
+	void InMobiAndroidManager_onDismissInterstitialScreenEvent()
+	{
+		Debug.Log( "onDismissInterstitialScreenEvent" );
+	}
+
+
+	void InMobiAndroidManager_onInterstitialFailedEvent( string error )
+	{
+		Debug.Log( "onInterstitialFailedEvent: " + error );
+	}
+
+
+	void InMobiAndroidManager_onInterstitialInteractionEvent( Dictionary<string,object> data )
+	{
+		Debug.Log( "onInterstitialInteractionEvent" );
+	}
+
+
+	void InMobiAndroidManager_onInterstitialLoadedEvent()
+	{
+		Debug.Log( "onInterstitialLoadedEvent" );
+	}
+
+
+	void InMobiAndroidManager_onInterstitialLeaveApplicationEvent()
+	{
+		Debug.Log( "onInterstitialLeaveApplicationEvent" );
+	}
+
+
+	void InMobiAndroidManager_onShowInterstitialScreenEvent()
+	{
+		Debug.Log( "onShowInterstitialScreenEvent" );
+	}
+
+	void  InMobiAndroidManager_onInterstitialAdRewardActionCompletedEvent( Dictionary<string,object> data)
+	{
+		Debug.Log( "onInterstitialAdRewardActionCompletedEvent" + data);
+
+	}
+
+	void InMobiAndroidManager_onNativeLoadedEvent(string data)
+	{
+		InMobiUI.nativeContent = data;
+		Debug.Log( "onNativeLoadedEvent" +  data );
+	}
+
+
+	void InMobiAndroidManager_onNativeFailedEvent(string error )
+	{
+		Debug.Log( "onNativeFailedEvent" + error );
+	}
+
+	void InMobiAndroidManager_onDismissNativeScreenEvent()
+	{
+		Debug.Log( "onDismissNativeScreenEvent" );
+	}
+
+	void InMobiAndroidManager_onShowNativeScreenEvent()
+	{
+		Debug.Log( "onShowNativeScreenEvent" );
+	}
+
+	void InMobiAndroidManager_onNativeLeaveApplicationEvent()
+	{
+		Debug.Log( "onNativeLeaveApplicationEvent" );
+	}
+
 
 	void AdCallbackHandler(ShowResult result){
 		
